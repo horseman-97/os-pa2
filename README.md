@@ -82,13 +82,15 @@ To better understand them, you will implement SJF, SRTF, round-robin, priority, 
 	- 450 pts + 10 pts 
 	- Some testcases are hidden and only show the final decision (i.e., pass/fail);
 
-- Code: ***sched.c*** (400 pts)
+
+- Code: ***pa2.c*** (400 pts)
 	- SJF scheduler: 20pts (tested using `multi`)
 	- SRTF scheduler: 50pts (`multi`);
 	- RR scheduler:  50pts (`multi` and `prio`)
 	- Priority scheduler: 60pts (`prio` and `resources-basic`)
 	- Priority scheduler + PCP: 70pts (`resources-basic`)
 	- Priority scheduler + PIP: 150pts (`resources-adv1` and `resources-adv2`)
+
 
 - Document: One PDF document (50 pts) including;
 	- Description how **each** scheduling policy is implemented
@@ -99,10 +101,12 @@ To better understand them, you will implement SJF, SRTF, round-robin, priority, 
 	  - No need recite what is explained in the class.
 	- No more than five pages
 
+
 - Git repository (10 pts)
 	- Register http URL and with a deploy token and password.
 	- Start the repository by cloning this repository.
 	- Make sure the token is valid through May 5 (due + 3 slip days + 2 day)
+
 
 - *WILL NOT ANSWER THE QUESTIONS ABOUT THOSE ALREADY SPECIFIED ON THE HANDOUT.*
 - *QUESTIONS OVER EMAIL WILL BE IGNORED UNLESS IT CONCERNS YOUR PRIVACY.*
