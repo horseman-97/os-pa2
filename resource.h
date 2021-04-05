@@ -36,9 +36,9 @@ struct resource {
 };
 
 /**
- * This system has 32 different resources. It is defined in pa2.c as an array of
+ * This system has 16 different resources. It is defined in sched.c as an array of
  * struct resource (i.e., struct resource resources[NR_RESOURCES];)
  */
-#define NR_RESOURCES 32
+#define NR_RESOURCES 16
 
 #endif
