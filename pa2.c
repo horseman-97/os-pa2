@@ -269,6 +269,19 @@ struct scheduler prio_scheduler = {
 
 
 /***********************************************************************
+ * Priority scheduler with aging
+ ***********************************************************************/
+struct scheduler pa_scheduler = {
+	.name = "Priority + aging",
+	/**
+	 * Implement your own acqure/release function to make priority
+	 * scheduler correct.
+	 */
+	/* Implement your own prio_schedule() and attach it here */
+};
+
+
+/***********************************************************************
  * Priority scheduler with priority ceiling protocol
  ***********************************************************************/
 struct scheduler pcp_scheduler = {

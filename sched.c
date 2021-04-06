@@ -81,6 +81,7 @@ extern struct scheduler sjf_scheduler;
 extern struct scheduler srtf_scheduler;
 extern struct scheduler rr_scheduler;
 extern struct scheduler prio_scheduler;
+extern struct scheduler pa_scheduler;
 extern struct scheduler pcp_scheduler;
 extern struct scheduler pip_scheduler;
 
@@ -423,7 +424,7 @@ static void __initialize(void)
 
 static void __print_usage(char * const name)
 {
-	printf("Usage: %s {-q} -[f|s|S|r|p|i] [process script file]\n", name);
+	printf("Usage: %s {-q} -[f|s|S|r|a|p|i] [process script file]\n", name);
 	printf("\n");
 	printf("  -q: Run quietly\n\n");
 	printf("  -f: Use FIFO scheduler (default)\n");
@@ -431,8 +432,9 @@ static void __print_usage(char * const name)
 	printf("  -S: Use SRTF scheduler\n");
 	printf("  -r: Use Round-robin scheduler\n");
 	printf("  -p: Use Priority scheduler\n");
-	printf("  -c: Use Priority with PCP scheduler\n");
-	printf("  -i: Use Priority with PIP scheduler\n");
+	printf("  -a: Use Priority scheduler with aging\n");
+	printf("  -c: Use Priority scheduler with PCP\n");
+	printf("  -i: Use Priority scheduler with PIP\n");
 	printf("\n");
 }
 
@@ -442,7 +444,7 @@ int main(int argc, char * const argv[])
 	int opt;
 	char *scriptfile;
 
-	while ((opt = getopt(argc, argv, "qfsSrpich")) != -1) {
+	while ((opt = getopt(argc, argv, "qfsSrpaich")) != -1) {
 		switch (opt) {
 		case 'q':
 			quiet = true;
@@ -462,6 +464,9 @@ int main(int argc, char * const argv[])
 			break;
 		case 'p':
 			sched = &prio_scheduler;
+			break;
+		case 'a':
+			sched = &pa_scheduler;
 			break;
 		case 'i':
 			sched = &pip_scheduler;

@@ -59,7 +59,9 @@ To better understand them, you will implement SJF, SRTF, round-robin, priority, 
 
 - The priority-based schedulers should handle processes with the same priority in the round-robin way; If two or more processes are with the same priority, they should be swiched on each tick.
 
-- To boost the priority of processes in PCP, use `MAX_PRIO` defined in `process.h`.
+- For priority with aging scheduler, waiting processes receive a priority boost by 1 for every context switch. The priority can be boosted up to `MAX_PRIO` defined in `process.h`. The boosted priority should be reset to the original priority of the process when the process is scheduled.
+
+- To boost the priority of processes in PCP, use `MAX_PRIO`.
 
 - When you implement PIP, make sure that the priority of a process is set properly when it releases a resource. There are complicated cases to implement PIP.
 	- More than one processes with different priority values can wait for the releasing resource. Suppose one process is holding one resource type, and other process is to acquire the same resource type. And then, another process with higher (or lower) priority is to acquire the resource type again, and then ...
