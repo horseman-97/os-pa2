@@ -84,8 +84,8 @@ To better understand them, you will implement SJF, SRTF, round-robin, priority, 
 
 - Use [PAsubmit](https://sslab.ajou.ac.kr/pasubmit) for submission
 	- 550 pts + 10 pts 
-	- Some testcases are hidden and only show the final decision (i.e., pass/fail);
-
+	- You can submit up to **30** times.
+	- The details of some testcase results are hidden and you can only check the final decision (i.e., pass/fail);
 
 - Code: ***pa2.c*** (500 pts)
 	- SJF scheduler: 20pts (tested using `multi`)
@@ -96,7 +96,6 @@ To better understand them, you will implement SJF, SRTF, round-robin, priority, 
 	- Priority scheduler + PCP: 70pts (`resources-basic`)
 	- Priority scheduler + PIP: 150pts (`resources-adv1` and `resources-adv2`)
 
-
 - Document: One PDF document (50 pts) including;
 	- Description how **each** scheduling policy is implemented
 	  - Do not explain the code itself. Instead, focus on explaining your idea and approach.
@@ -106,14 +105,12 @@ To better understand them, you will implement SJF, SRTF, round-robin, priority, 
 		- Explain to the 12nd tick.
 	- Lesson learned
 	  - No need recite what is explained in the class.
-	- No more than five pages
-
+	- No more than **five** pages
 
 - Git repository (10 pts)
 	- Register http URL and with a deploy token and password.
 	- Start the repository by cloning this repository.
 	- Make sure the token is valid through May 7 (due + 3 slip days + 4 day)
-
 
 - *WILL NOT ANSWER THE QUESTIONS ABOUT THOSE ALREADY SPECIFIED ON THE HANDOUT.*
 - *QUESTIONS OVER EMAIL WILL BE IGNORED UNLESS IT CONCERNS YOUR PRIVACY.*
