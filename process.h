@@ -31,9 +31,9 @@ struct process {
 	enum process_status status;
 							/* The status of the process */
 
-	unsigned int age;		/* # of ticks since the process was forked */
+	unsigned int age;		/* # of ticks the process was scheduled in */
 	unsigned int lifespan;	/* The lifespan of the process. The process will
-							   be exited with age == lifespan */
+							   be exited when age == lifespan */
 
 	unsigned int prio;		/* Currently effective priority of the process.
 							   0 by default, and the larger, the more important
@@ -42,12 +42,12 @@ struct process {
 	struct list_head list;	/* list head for listing processes */
 
 	/**
-	 * You might need following(s) to implement PIP
+	 * You might need following(s) to implement dynamic priority features
 	 */
 	unsigned int prio_orig;	/* The original priority of the process */
 
 
-	/* DO NOT ACCESS FOLLOWING VARIABLES */
+	/** DO NOT ACCESS FOLLOWING VARIABLES **/
 	unsigned int __starts_at;	/* When to fork the process */
 
 	struct list_head __resources_to_acquire;
