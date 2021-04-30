@@ -271,7 +271,48 @@ struct scheduler sjf_scheduler = {
 /***********************************************************************
  * SRTF scheduler
  ***********************************************************************/
+static int srtf_initialize(void)
+{
+	return 0;
+}
 
+static void srtf_finalize(void)
+{
+}
+
+static struct process *srtf_schedule(void)
+{
+	struct process *next = NULL;
+	struct process *temp;
+	if (!current || current->status == PROCESS_WAIT)
+	{
+		goto pick_next;
+	}
+
+	if (current->age < current->lifespan)
+	{
+		list_add_tail(&current->list, &readyqueue); // preemptive
+		goto pick_next;
+	}
+
+pick_next:
+
+	if (!list_empty(&readyqueue))
+	{
+		unsigned int min = 1000000; // it should be located 'outside' of for loop
+		list_for_each_entry(temp, &readyqueue, list)
+		{
+			if (temp->lifespan - temp->age < min)
+			{
+				min = temp->lifespan-temp->age;
+				next = temp;
+			}
+		}
+		list_del_init(&next->list);
+	}
+
+	return next;
+}
 
 struct scheduler srtf_scheduler = {
 	.name = "Shortest Remaining Time First",
@@ -282,7 +323,7 @@ struct scheduler srtf_scheduler = {
 	/* Obviously, you should implement srtf_schedule() and attach it here */
 	.schedule = srtf_schedule,
 	.finalize = srtf_finalize,
-	.initialize = srtf_initalize,
+	.initialize = srtf_initialize,
 };
 
 
