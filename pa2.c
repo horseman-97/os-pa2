@@ -283,7 +283,7 @@ static void srtf_finalize(void)
 static struct process *srtf_schedule(void)
 {
 	struct process *next = NULL;
-	struct process *temp;
+
 	if (!current || current->status == PROCESS_WAIT)
 	{
 		goto pick_next;
@@ -299,6 +299,7 @@ pick_next:
 
 	if (!list_empty(&readyqueue))
 	{
+		struct process *temp;
 		unsigned int min = 1000000; // it should be located 'outside' of for loop
 		list_for_each_entry(temp, &readyqueue, list)
 		{
@@ -379,6 +380,49 @@ struct scheduler rr_scheduler = {
 /***********************************************************************
  * Priority scheduler
  ***********************************************************************/
+static int prio_initialize(void)
+{
+	return 0;
+}
+
+static void prio_finalize(void)
+{
+}
+
+static struct process *prio_schedule(void)
+{
+	struct process *next = NULL;
+	if (!current || current->status == PROCESS_WAIT)
+	{
+		goto pick_next;
+	}
+
+	if (current->age < current->lifespan)
+	{
+		list_add_tail(&current->list, &readyqueue); // preemptive
+		goto pick_next;
+	}
+
+pick_next:
+
+	if (!list_empty(&readyqueue))
+	{
+		next = list_first_entry(&readyqueue, struct process, list);
+		struct process *temp;
+		list_for_each_entry(temp, &readyqueue, list)
+		{
+			if (temp->prio > next->prio)
+			{
+				next = temp;
+			}
+		}
+		list_del_init(&next->list);
+	}
+
+	return next;
+
+}
+
 struct scheduler prio_scheduler = {
 	.name = "Priority",
 	/**
@@ -386,6 +430,11 @@ struct scheduler prio_scheduler = {
 	 * scheduler correct.
 	 */
 	/* Implement your own prio_schedule() and attach it here */
+	.acquire = fcfs_acquire,
+	.release = fcfs_release,
+	.initialize = prio_initialize,
+	.finalize = prio_finalize,
+	.schedule = prio_schedule,
 };
 
 
