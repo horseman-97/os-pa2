@@ -213,27 +213,66 @@ struct scheduler fifo_scheduler = {
 /***********************************************************************
  * SJF scheduler
  ***********************************************************************/
+static int sjf_initialize(void)
+{
+	return 0;
+}
+
+static void sjf_finalize(void)
+{
+}
+
 static struct process *sjf_schedule(void)
 {
-	/**
-	 * Implement your own SJF scheduler here.
-	 */
-	return NULL;
+	struct process *next = NULL;
+	// dump_status();
+
+	if (!current || current->status == PROCESS_WAIT)
+	{
+		goto pick_next;
+	}
+
+	if (current->age < current->lifespan)
+	{
+		return current;
+	}
+
+pick_next:
+
+	if (!list_empty(&readyqueue))
+	{
+		struct process *temp;
+		next = list_first_entry(&readyqueue, struct process, list);
+		list_for_each_entry(temp,&readyqueue,list)
+		{
+			if(temp->lifespan < next->lifespan)
+			{
+				next = temp;
+			}
+		}
+		list_del_init(&next->list);
+	}
+
+	return next;
 }
 
 struct scheduler sjf_scheduler = {
 	.name = "Shortest-Job First",
 	.acquire = fcfs_acquire, /* Use the default FCFS acquire() */
 	.release = fcfs_release, /* Use the default FCFS release() */
-	.schedule = NULL,		 /* TODO: Assign sjf_schedule()
+	.schedule = sjf_schedule,		 /* TODO: Assign sjf_schedule()
 								to this function pointer to activate
 								SJF in the system */
+	.initialize = sjf_initialize,
+	.finalize = sjf_finalize,
 };
 
 
 /***********************************************************************
  * SRTF scheduler
  ***********************************************************************/
+
+
 struct scheduler srtf_scheduler = {
 	.name = "Shortest Remaining Time First",
 	.acquire = fcfs_acquire, /* Use the default FCFS acquire() */
@@ -241,6 +280,9 @@ struct scheduler srtf_scheduler = {
 	/* You need to check the newly created processes to implement SRTF.
 	 * Use @forked() callback to mark newly created processes */
 	/* Obviously, you should implement srtf_schedule() and attach it here */
+	.schedule = srtf_schedule,
+	.finalize = srtf_finalize,
+	.initialize = srtf_initalize,
 };
 
 
