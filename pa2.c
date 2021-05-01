@@ -493,6 +493,106 @@ struct scheduler prio_scheduler = {
 /***********************************************************************
  * Priority scheduler with aging
  ***********************************************************************/
+static int pa_initialize(void)
+{
+	return 0;
+}
+
+static void pa_finalize(void)
+{
+}
+
+bool pa_acquire(int resource_id)
+{
+	struct resource *r = resources + resource_id;
+
+	if (!r->owner)
+	{
+		r->owner = current;
+		return true;
+	}
+
+	current->status = PROCESS_WAIT;
+
+	list_add_tail(&current->list, &r->waitqueue);
+	return false;
+}
+
+void pa_release(int resource_id)
+{
+	struct resource *r = resources + resource_id;
+	assert(r->owner == current);
+
+	r->owner = NULL;
+
+	if (!list_empty(&r->waitqueue))
+	{
+		struct process *waiter =
+			list_first_entry(&r->waitqueue, struct process, list);
+		struct process *temp;
+
+		list_for_each_entry(temp, &r->waitqueue, list)
+		{
+			if (temp->prio > waiter->prio)
+			{
+				waiter = temp;
+			}
+		}
+
+		assert(waiter->status == PROCESS_WAIT);
+
+		list_del_init(&waiter->list);
+
+		waiter->status = PROCESS_READY;
+
+		list_add_tail(&waiter->list, &readyqueue);
+	}
+}
+
+static struct process *pa_schedule(void)
+{
+	dump_status();
+	struct process *next = NULL;
+
+	if (!current || current->status == PROCESS_WAIT)
+	{
+		goto pick_next;
+	}
+
+	if (current)
+	{
+		current->prio = current->prio_orig;
+	}
+
+	struct process *ready;
+	list_for_each_entry(ready, &readyqueue, list)
+	{
+		ready->prio += 1;
+	}
+
+	if (current->age < current->lifespan)
+	{
+		list_add_tail(&current->list, &readyqueue);
+	}
+
+pick_next:
+
+	if (!list_empty(&readyqueue))
+	{
+		next = list_first_entry(&readyqueue, struct process, list);
+		struct process *temp;
+		list_for_each_entry(temp, &readyqueue, list)
+		{
+			if (temp->prio > next->prio)
+			{
+				next = temp;
+			}
+		}
+		list_del_init(&next->list);
+	}
+	return next;
+}
+
 struct scheduler pa_scheduler = {
 	.name = "Priority + aging",
 	/**
@@ -500,18 +600,87 @@ struct scheduler pa_scheduler = {
 	 * scheduler correct.
 	 */
 	/* Implement your own prio_schedule() and attach it here */
+	.initialize = pa_initialize,
+	.finalize = pa_finalize,
+	.acquire = pa_acquire,
+	.release = pa_release,
+	.schedule = pa_schedule,
 };
 
 
 /***********************************************************************
  * Priority scheduler with priority ceiling protocol
  ***********************************************************************/
+static int pcp_initialize(void)
+{
+	return 0;
+}
+
+static void pcp_finalize(void)
+{
+}
+
+bool pcp_acquire(int resource_id)
+{
+	struct resource *r = resources + resource_id;
+
+	if (!r->owner)
+	{
+		current->prio = MAX_PRIO;
+		r->owner = current;
+		return true;
+	}
+	//change resource owned process priority
+
+	current->status = PROCESS_WAIT;
+
+	list_add_tail(&current->list, &r->waitqueue);
+	return false;
+}
+
+void pcp_release(int resource_id)
+{
+	struct resource *r = resources + resource_id;
+
+	assert(r->owner == current);
+	r->owner->prio = r->owner->prio_orig;
+	r->owner = NULL;
+
+	if (!list_empty(&r->waitqueue))
+	{
+		struct process *waiter =
+			list_first_entry(&r->waitqueue, struct process, list);
+		struct process *temp;
+
+		list_for_each_entry(temp, &r->waitqueue, list) // not readyqueue, but waitqueue
+		{
+			if (temp->prio > waiter->prio)
+			{
+				waiter = temp;
+			}
+		}
+
+		assert(waiter->status == PROCESS_WAIT);
+
+		list_del_init(&waiter->list);
+
+		waiter->status = PROCESS_READY;
+
+		list_add_tail(&waiter->list, &readyqueue);
+	}
+}
+
 struct scheduler pcp_scheduler = {
 	.name = "Priority + PCP Protocol",
 	/**
 	 * Implement your own acqure/release function too to make priority
 	 * scheduler correct.
 	 */
+	.initialize = pcp_initialize,
+	.finalize = pcp_finalize,
+	.acquire = pcp_acquire,
+	.release = pcp_release,
+	.schedule = prio_schedule,
 };
 
 
