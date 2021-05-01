@@ -389,6 +389,58 @@ static void prio_finalize(void)
 {
 }
 
+bool prio_acquire(int resource_id)
+{
+	struct resource *r = resources + resource_id;
+
+	if (!r->owner)
+	{
+		r->owner = current;
+		return true;
+	}
+
+	current->status = PROCESS_WAIT;
+
+	list_add_tail(&current->list, &r->waitqueue);
+	return false;
+}
+
+void prio_release(int resource_id)
+{
+	struct resource *r = resources + resource_id;
+
+	assert(r->owner == current);
+
+	r->owner = NULL;
+
+	if (!list_empty(&r->waitqueue))
+	{
+		struct process *waiter =
+			list_first_entry(&r->waitqueue, struct process, list);
+		struct process *temp;
+
+		/**
+		 * For Prevent priority inversion, use temporary comparable process 'temp'
+		 * Replace waiter process when temp process's priority is higher than current waiter process
+		 */
+		list_for_each_entry(temp, &r->waitqueue, list) // not readyqueue, but waitqueue
+		{
+			if (temp->prio > waiter->prio)
+			{
+				waiter = temp;
+			}
+		}
+
+		assert(waiter->status == PROCESS_WAIT);
+
+		list_del_init(&waiter->list);
+
+		waiter->status = PROCESS_READY;
+
+		list_add_tail(&waiter->list, &readyqueue);
+	}
+}
+
 static struct process *prio_schedule(void)
 {
 	struct process *next = NULL;
@@ -430,8 +482,8 @@ struct scheduler prio_scheduler = {
 	 * scheduler correct.
 	 */
 	/* Implement your own prio_schedule() and attach it here */
-	.acquire = fcfs_acquire,
-	.release = fcfs_release,
+	.acquire = prio_acquire,
+	.release = prio_release,
 	.initialize = prio_initialize,
 	.finalize = prio_finalize,
 	.schedule = prio_schedule,
